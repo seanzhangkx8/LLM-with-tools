@@ -1,0 +1,13 @@
+openai
+pandas
+numpy
+matplotlib
+easydict
+pytorch-lightning~=1.9
+transformers
+datasets
+sentencepiece
+deepspeed
+scipy
+wandb
+scikit-learn
