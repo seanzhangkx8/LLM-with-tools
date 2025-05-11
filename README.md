@@ -5,4 +5,4 @@ Distilling LLM, and make the smaller model use tools to enhance performance
 
 run from root directory:
 ```
-python model/train.py --save_dir train/weighted/
+python model/train.py --save_dir model/weights/

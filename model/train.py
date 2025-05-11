@@ -7,7 +7,7 @@ import os
 import random
 import numpy as np
 from transformers import AutoTokenizer, AutoModelForCausalLM, get_linear_schedule_with_warmup
-from test import evaluate_model
+from eval import evaluate_model
 
 from data import ReasoningDataset, Collator, InferenceCollator
 
@@ -119,9 +119,6 @@ def parse_args():
     parser.add_argument('--wandb', type=str, default='online', help="Wandb mode")
 
     args = parser.parse_args()
-
-    args.loss_weights = tuple(args.loss_weights)
-
     return args
 
 
@@ -132,7 +129,6 @@ if __name__ == '__main__':
     LR = args.lr
     NUM_EPOCHS = args.num_epochs
     LLM_NAME = args.llm_name
-    LOSS_WEIGHTS = args.loss_weights
     SAVE_DIR = args.save_dir
     DATA_DIR = args.data_dir
 
@@ -172,8 +168,7 @@ if __name__ == '__main__':
                                                 num_training_steps=training_steps)
 
     wandb.init(mode=args.wandb, project="Weighted-CoT-Distill",
-               config={"backbone": LLM_NAME, "epochs": NUM_EPOCHS, "lr": LR, "batch_size": BATCH_SIZE,
-                       "loss_weights": LOSS_WEIGHTS})
+               config={"backbone": LLM_NAME, "epochs": NUM_EPOCHS, "lr": LR, "batch_size": BATCH_SIZE})
 
     train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, scheduler, criterion,
           num_epochs=NUM_EPOCHS, save_dir=SAVE_DIR)
