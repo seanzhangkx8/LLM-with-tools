@@ -151,7 +151,7 @@ if __name__ == '__main__':
     answer_token_id = tokenizer.convert_tokens_to_ids(answer_token)
     eos_token_id = tokenizer.eos_token_id
 
-    collator = Collator(tokenizer, DEVICE, question_token, rationale_token, answer_token, loss_weights=LOSS_WEIGHTS)
+    collator = Collator(tokenizer, DEVICE, question_token, rationale_token, answer_token)
     inference_collator = InferenceCollator(tokenizer, DEVICE, question_token, rationale_token, answer_token)
 
     train_dataset = ReasoningDataset(f"{DATA_DIR}/gsm8k_train.json")
