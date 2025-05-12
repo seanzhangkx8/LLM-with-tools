@@ -37,6 +37,7 @@ def train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, sc
                         input_ids = batch['input_ids']
                         outputs = model(input_ids=input_ids, attention_mask=batch['attention_mask'])
                         loss = criterion(outputs.logits.view(-1, outputs.logits.size(-1)), input_ids.view(-1))
+                        loss = loss.mean()
 
                         if phase == "train":
                             optimizer.zero_grad()
@@ -167,7 +168,7 @@ if __name__ == '__main__':
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=int(0.1 * training_steps),
                                                 num_training_steps=training_steps)
 
-    wandb.init(mode=args.wandb, project="Weighted-CoT-Distill",
+    wandb.init(mode=args.wandb, project="Distilled-LLM-with-tools",
                config={"backbone": LLM_NAME, "epochs": NUM_EPOCHS, "lr": LR, "batch_size": BATCH_SIZE})
 
     train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, scheduler, criterion,
