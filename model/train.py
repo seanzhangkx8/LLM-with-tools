@@ -162,10 +162,6 @@ if __name__ == '__main__':
     # test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, collate_fn=inference_collator, shuffle=False)
     test_loader = DataLoader(test_subset, batch_size=BATCH_SIZE, collate_fn=inference_collator, shuffle=False)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 9298de6a7dec111bc6371ca533ecb05768484f08
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
     training_steps = len(train_loader) * NUM_EPOCHS
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=int(0.1 * training_steps),
