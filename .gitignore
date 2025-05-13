@@ -1,5 +1,6 @@
 # Ignore Weights
 model/weights/*
+model/weights_HF_loss/*
 
 # wandb
 wandb/

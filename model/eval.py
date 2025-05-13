@@ -34,7 +34,7 @@ def evaluate_model(model, test_loader, tokenizer):
                 new_attn_mask = torch.cat((batch['attention_mask'], torch.ones(outputs.shape[0], (outputs.shape[1] -  input_ids.shape[1] + 1)).to(outputs.device)), dim=1)
                 outputs = model.generate(input_ids=predictions, attention_mask=new_attn_mask.to(predictions.device), max_new_tokens=10, pad_token_id=tokenizer.pad_token_id, eos_token_id=tokenizer.eos_token_id)
                 predictions = tokenizer.batch_decode(outputs, skip_special_tokens=False)
-                print(predictions)
+                # print(predictions)
                 predictions = [
                                     re.search(r"<\|answer\|>(.*?)" + re.escape(tokenizer.eos_token), words).group(1).strip()
                                     if re.search(r"<\|answer\|>(.*?)" + re.escape(tokenizer.eos_token), words) else ''
