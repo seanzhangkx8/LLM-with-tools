@@ -44,6 +44,7 @@ class Collator:
             padding_side='left',
             return_tensors='pt'
         ).to(self.device)
+        tokenized_prompts["labels"] = tokenized_prompts['input_ids'].masked_fill(~(tokenized_prompts['attention_mask'].bool()), -100).to(self.device)
 
         return tokenized_prompts
 

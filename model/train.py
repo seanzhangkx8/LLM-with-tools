@@ -34,8 +34,7 @@ def train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, sc
                 tepoch.set_description(f"Epoch {epoch + 1}/{num_epochs} {phase.capitalize()}")
                 for batch in tepoch:
                     with torch.set_grad_enabled(phase == "train"):
-                        input_ids = batch['input_ids']
-                        outputs = model(input_ids=input_ids, attention_mask=batch['attention_mask'], labels=input_ids)
+                        outputs = model(**batch)
                         loss = outputs.loss
 
                         if phase == "train":
@@ -163,6 +162,10 @@ if __name__ == '__main__':
     # test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, collate_fn=inference_collator, shuffle=False)
     test_loader = DataLoader(test_subset, batch_size=BATCH_SIZE, collate_fn=inference_collator, shuffle=False)
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> 9298de6a7dec111bc6371ca533ecb05768484f08
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
     training_steps = len(train_loader) * NUM_EPOCHS
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=int(0.1 * training_steps),
