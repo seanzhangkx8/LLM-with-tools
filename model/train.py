@@ -138,7 +138,7 @@ if __name__ == '__main__':
     rationale_token = "<|rationale|>"
     answer_token = "<|answer|>"
 
-    lora_config = LoraConfig(**LoraConfig.from_json_file("config/lora_config.json"))
+    lora_config = LoraConfig(**LoraConfig.from_json_file("model/config/lora_config.json"))
 
     model = AutoModelForCausalLM.from_pretrained(LLM_NAME).to(DEVICE)
     model = get_peft_model(model, lora_config)
