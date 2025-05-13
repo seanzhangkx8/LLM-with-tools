@@ -2,6 +2,7 @@ import torch
 import argparse
 import wandb
 from torch.utils.data import DataLoader, Subset
+from peft import get_peft_model, LoraConfig, PeftModelCausalLM
 from tqdm import tqdm
 import os
 import random
@@ -18,7 +19,6 @@ torch.cuda.manual_seed(42)
 torch.cuda.manual_seed_all(42)
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
-
 
 def train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, scheduler, criterion, num_epochs, save_dir):
     best_metrics = {"acc" : -100, "precision" : -100, "recall" : -100, "f1" : -100, "loss" : 10000}
@@ -138,7 +138,10 @@ if __name__ == '__main__':
     rationale_token = "<|rationale|>"
     answer_token = "<|answer|>"
 
+    lora_config = LoraConfig(**LoraConfig.from_json_file("config/lora_config.json"))
+
     model = AutoModelForCausalLM.from_pretrained(LLM_NAME).to(DEVICE)
+    model = get_peft_model(model, lora_config)
     tokenizer = AutoTokenizer.from_pretrained(LLM_NAME)
     tokenizer.add_special_tokens({"pad_token": pad_token, "additional_special_tokens": [question_token, rationale_token, answer_token, '<<', '>>']})
     model.resize_token_embeddings(len(tokenizer))

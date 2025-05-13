@@ -1,0 +1,18 @@
+{
+    "bias" : "none",
+    "fan_in_fan_out" : false,
+    "init_lora_weights" : true,
+    "lora_alpha" : 128,
+    "lora_dropout" : 0.0,
+    "lora_r" : 64,
+    "lora_target_modules" : [
+        "q_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+        "fc1",
+        "fc2"
+    ]
+}

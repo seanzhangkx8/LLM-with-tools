@@ -11,3 +11,4 @@ deepspeed
 scipy
 wandb
 scikit-learn
+peft
