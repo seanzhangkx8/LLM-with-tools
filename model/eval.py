@@ -54,7 +54,7 @@ if __name__ == '__main__':
     BATCH_SIZE = 8
     LR = 1e-6
     NUM_EPOCHS = 30
-    LLM_NAME = "meta-llama/Llama-3.2-1B-Instruct"
+    LLM_NAME = "meta-llama/Llama-3.2-3B-Instruct"
     # LLM_NAME = "gpt2"
 
     pad_token = "<|pad|>"

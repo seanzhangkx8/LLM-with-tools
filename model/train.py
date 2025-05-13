@@ -112,7 +112,7 @@ def parse_args():
                         help='Learning rate')
     parser.add_argument('--num_epochs', type=int, default=50,
                         help='Number of training epochs')
-    parser.add_argument('--llm_name', type=str, default='meta-llama/Llama-3.2-1B',
+    parser.add_argument('--llm_name', type=str, default='meta-llama/Llama-3.2-3B-Instruct',
                         help='Name of the language model to use')
     parser.add_argument('--save_dir', type=str, default="weights/",
                         help='Directory to save model checkpoints')
@@ -140,7 +140,7 @@ if __name__ == '__main__':
 
     model = AutoModelForCausalLM.from_pretrained(LLM_NAME).to(DEVICE)
     tokenizer = AutoTokenizer.from_pretrained(LLM_NAME)
-    tokenizer.add_special_tokens({"pad_token": pad_token, "additional_special_tokens": [question_token, rationale_token, answer_token]})
+    tokenizer.add_special_tokens({"pad_token": pad_token, "additional_special_tokens": [question_token, rationale_token, answer_token, '<<', '>>']})
     model.resize_token_embeddings(len(tokenizer))
 
     question_token_id = tokenizer.convert_tokens_to_ids(question_token)
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=int(0.1 * training_steps),
                                                 num_training_steps=training_steps)
 
-    wandb.init(mode=args.wandb, project="Distilled-LLM-with-tools",
+    wandb.init(mode=args.wandb, project="LLM-with-tools",
                config={"backbone": LLM_NAME, "epochs": NUM_EPOCHS, "lr": LR, "batch_size": BATCH_SIZE})
 
     train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, scheduler, criterion,

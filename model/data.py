@@ -35,7 +35,7 @@ class Collator:
         self.token_idf = None
 
     def __call__(self, batch):
-        prompts = [f"{self.question_token}{item['question']}{self.rationale_token}{item['rationale']}{self.answer_token}{item['answer']}{self.tokenizer.eos_token}" for item in batch]
+        prompts = [f"{self.question_token}{item['question']}Let's think step by step: {self.rationale_token}{item['rationale']}{self.answer_token}{item['answer']}{self.tokenizer.eos_token}" for item in batch]
 
         tokenized_prompts = self.tokenizer(
             prompts,
@@ -56,7 +56,7 @@ class InferenceCollator(Collator):
         )
 
     def __call__(self, batch):
-        prompts = [f"{self.question_token}{item['question']}{self.rationale_token}" for item in batch]
+        prompts = [f"{self.question_token}{item['question']}Let's think step by step: {self.rationale_token}" for item in batch]
         answers = [f"{item['answer']}" for item in batch]
 
         tokenized_prompts = self.tokenizer(
