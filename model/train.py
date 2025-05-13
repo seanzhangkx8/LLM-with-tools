@@ -20,7 +20,7 @@ torch.cuda.manual_seed_all(42)
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-def train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, scheduler, criterion, num_epochs, save_dir):
+def train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, scheduler, num_epochs, save_dir):
     best_metrics = {"acc" : -100, "precision" : -100, "recall" : -100, "f1" : -100, "loss" : 10000}
     for epoch in range(num_epochs):
         for phase, loader in zip(["train", "validate"], [train_loader, val_loader]):
@@ -35,9 +35,8 @@ def train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, sc
                 for batch in tepoch:
                     with torch.set_grad_enabled(phase == "train"):
                         input_ids = batch['input_ids']
-                        outputs = model(input_ids=input_ids, attention_mask=batch['attention_mask'])
-                        loss = criterion(outputs.logits.view(-1, outputs.logits.size(-1)), input_ids.view(-1))
-                        loss = loss.mean()
+                        outputs = model(input_ids=input_ids, attention_mask=batch['attention_mask'], labels=input_ids)
+                        loss = outputs.loss
 
                         if phase == "train":
                             optimizer.zero_grad()
@@ -164,8 +163,6 @@ if __name__ == '__main__':
     # test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, collate_fn=inference_collator, shuffle=False)
     test_loader = DataLoader(test_subset, batch_size=BATCH_SIZE, collate_fn=inference_collator, shuffle=False)
 
-
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=-100, reduction='none')  # set reduction to none, return shape [batch_size * seq_len]
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
     training_steps = len(train_loader) * NUM_EPOCHS
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=int(0.1 * training_steps),
@@ -174,7 +171,7 @@ if __name__ == '__main__':
     wandb.init(mode=args.wandb, project="LLM-with-tools",
                config={"backbone": LLM_NAME, "epochs": NUM_EPOCHS, "lr": LR, "batch_size": BATCH_SIZE})
 
-    train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, scheduler, criterion,
+    train(model, train_loader, val_loader, test_loader, optimizer, tokenizer, scheduler,
           num_epochs=NUM_EPOCHS, save_dir=SAVE_DIR)
 
     wandb.finish()
