@@ -2,7 +2,7 @@ import torch
 import argparse
 import wandb
 from torch.utils.data import DataLoader, Subset
-from peft import get_peft_model, LoraConfig, PeftModelCausalLM
+from peft import get_peft_model, LoraConfig
 from tqdm import tqdm
 import os
 import random
