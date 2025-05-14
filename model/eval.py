@@ -34,7 +34,7 @@ def evaluate_model(model, test_loader, tokenizer):
                 new_attn_mask = torch.cat((batch['attention_mask'], torch.ones(outputs.shape[0], (outputs.shape[1] -  input_ids.shape[1] + 1)).to(outputs.device)), dim=1)
                 outputs = model.generate(input_ids=predictions, attention_mask=new_attn_mask.to(predictions.device), max_new_tokens=10, pad_token_id=tokenizer.pad_token_id, eos_token_id=tokenizer.eos_token_id)
                 predictions = tokenizer.batch_decode(outputs, skip_special_tokens=False)
-                # print(predictions)
+                print(predictions)
                 predictions = [
                                     re.search(r"<\|answer\|>(.*?)" + re.escape(tokenizer.eos_token), words).group(1).strip()
                                     if re.search(r"<\|answer\|>(.*?)" + re.escape(tokenizer.eos_token), words) else ''
@@ -51,13 +51,14 @@ def evaluate_model(model, test_loader, tokenizer):
 
 
 if __name__ == '__main__':
-    model_path = "model/weights/acc/model"  # Replace <epoch_num> with the checkpoint you want (e.g. model-5)
+    # model_path = "model/weights_1B_HF_loss/acc/model"  # Replace <epoch_num> with the checkpoint you want (e.g. model-5), none if use out of box model
+    model_path = None
     DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # DEVICE = 'cpu'
-    BATCH_SIZE = 1
+    BATCH_SIZE = 8
     LR = 1e-6
     NUM_EPOCHS = 30
-    LLM_NAME = "meta-llama/Llama-3.2-3B-Instruct"
+    LLM_NAME = "meta-llama/Llama-3.2-1B-Instruct"
     # LLM_NAME = "gpt2"
 
     pad_token = "<|pad|>"
@@ -66,29 +67,35 @@ if __name__ == '__main__':
     rationale_token = "<|rationale|>"
     answer_token = "<|answer|>"
 
-    # lora_config = LoraConfig(**LoraConfig.from_json_file("model/config/lora_config.json"))
-
-    # model = AutoModelForCausalLM.from_pretrained(model_path).to(DEVICE)
-    # model = get_peft_model(model, lora_config)
-
-    peft_config = PeftConfig.from_pretrained(model_path)
-    tokenizer = AutoTokenizer.from_pretrained(peft_config.base_model_name_or_path)
-    tokenizer.add_special_tokens({
-        "pad_token": pad_token,
-        "additional_special_tokens": [
-            question_token,
-            rationale_token,
-            answer_token,
-            "<<", ">>"
-        ]
-    })
-    model = AutoModelForCausalLM.from_pretrained(peft_config.base_model_name_or_path)
-    model.resize_token_embeddings(len(tokenizer))
-    model = PeftModel.from_pretrained(model, model_path).to(DEVICE) # Load the LoRA adapter
-
-    # tokenizer = AutoTokenizer.from_pretrained(LLM_NAME)
-    # tokenizer.add_special_tokens({"pad_token": pad_token, "eos_token": eos_token, "additional_special_tokens": [question_token, rationale_token, answer_token]})
-    # model.resize_token_embeddings(len(tokenizer))
+    if model_path:
+        peft_config = PeftConfig.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(peft_config.base_model_name_or_path)
+        tokenizer.add_special_tokens({
+            "pad_token": pad_token,
+            "additional_special_tokens": [
+                question_token,
+                rationale_token,
+                answer_token,
+                "<<", ">>"
+            ]
+        })
+        model = AutoModelForCausalLM.from_pretrained(peft_config.base_model_name_or_path)
+        model.resize_token_embeddings(len(tokenizer))
+        model = PeftModel.from_pretrained(model, model_path).to(DEVICE) # Load the LoRA adapter
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(LLM_NAME)
+        tokenizer.add_special_tokens({
+            "pad_token": pad_token,
+            "additional_special_tokens": [
+                question_token,
+                rationale_token,
+                answer_token,
+                "<<", ">>"
+            ]
+        })
+        model = AutoModelForCausalLM.from_pretrained(LLM_NAME).to(DEVICE)
+        model.resize_token_embeddings(len(tokenizer))
+    model.eval()
 
     question_token_id = tokenizer.convert_tokens_to_ids(question_token)
     rationale_token_id = tokenizer.convert_tokens_to_ids(rationale_token)

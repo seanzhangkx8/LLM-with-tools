@@ -110,7 +110,7 @@ def parse_args():
                         help='Learning rate')
     parser.add_argument('--num_epochs', type=int, default=50,
                         help='Number of training epochs')
-    parser.add_argument('--llm_name', type=str, default='meta-llama/Llama-3.2-3B-Instruct',
+    parser.add_argument('--llm_name', type=str, default='meta-llama/Llama-3.2-1B-Instruct',
                         help='Name of the language model to use')
     parser.add_argument('--save_dir', type=str, default="weights/",
                         help='Directory to save model checkpoints')
